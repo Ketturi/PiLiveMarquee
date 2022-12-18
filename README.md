@@ -26,19 +26,19 @@ so long as it is named same as the romname for the game. Application builds reso
 Example directory structure:
 ```
 Application Directory
-	└───LiveMarquee.py
-		resources/
-		├───MAME/
-		│   ├───flyer/
-		│	│	└───tempest.png
-		│	├───instruction/
-		│	│	└───invaders.png	<-API example: http://localhost/marquee/MAME/invaders
-		│	└───default.png 		<-This is shown, if romname given does not match any files on resources, and emulator is MAME
-		├───NES/
-		│	└───default.png
-		├───SNES/
-		│	└───default.png
-		└───startupimage.png 		<-This is shown at the start of the application before image is set through API
+  └───LiveMarquee.py
+      resources/
+      ├───MAME/
+      │   ├───flyer/
+      │   │   └───tempest.png
+      │   ├───instruction/
+      │   │   └───invaders.png <-API example: http://localhost/marquee/MAME/invaders
+      │   └───default.png      <-This is shown, if romname given does not match any files on resources, and emulator is MAME
+      ├───NES/
+      │   └───default.png
+      ├───SNES/
+      │   └───default.png
+      └───startupimage.png     <-This is shown at the start of the application before image is set through API
 ```
 	
 ## Installation
