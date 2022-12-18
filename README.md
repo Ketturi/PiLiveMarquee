@@ -4,17 +4,17 @@
 ## HTTP API
 
 Set image to be shown on the screen:
-http://<hostname>/marquee/<emulator>/<romname>
-Where emulator and romname tags are send by attract mode front-end.
+http://"hostname"/marquee/"emulator"/"romname"
+where emulator and romname tags are send by attract mode front-end.
 If image file corresponding to romname is not found, 
 default image for the emulator given is shown.
 
 Exit application:
-http://<hostname>/quit 
+http://"hostname"/quit 
 Shuts down screen server gracefully, so that service manager can restart it
 
 Forcibly reload application:
-http://<hostname>/reload
+http://"hostname"/reload
 Application is forcibly killed and relaunched by os services.
 
 ## Images
