@@ -90,28 +90,38 @@ to the cmdline.txt
 quiet splash logo.nologo vt.global_cursor_default=0 loglevel=0 fbcon=rotate:3
 ```
 
-###Compile SDL2 with KMSDRM support: 
+###### Compile SDL2 with KMSDRM support: 
 Currently, libsdl2 from raspbian repository does not support kmsdrm.
 SDL2 has to be compiled, if x11 is not used.
 Install needed libraries and build environment:
-`sudo apt install -y build-essential git libasound2-dev libsamplerate0-dev libibus-1.0-dev libdbus-1-dev libudev-dev libgles2-mesa-dev libdrm-dev libgbm-dev`
+```
+sudo apt install -y build-essential git libasound2-dev libsamplerate0-dev libibus-1.0-dev libdbus-1-dev libudev-dev libgles2-mesa-dev libdrm-dev libgbm-dev
+```
 
-`wget https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.22.tar.gz`
-`tar -zxf release-2.0.22.tar.gz`
-`cd SDL-release-2.0.22`
-`CFLAGS='-mfpu=neon -mtune=cortex-a72 -march=armv8-a' ./configure --prefix=/usr --disable-video-x11 --disable-video-wayland --disable-video-rpi --disable-rpath --disable-esd --disable-oss --disable-sndio --disable-pulseaudio --disable-nas --enable-video-kmsdrm --enable-arm-neon`
-`make -j4`
-`sudo make install`
+Download and compile:
+```
+wget https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.22.tar.gz
+tar -zxf release-2.0.22.tar.gz
+cd SDL-release-2.0.22
+CFLAGS='-mfpu=neon -mtune=cortex-a72 -march=armv8-a' ./configure --prefix=/usr --disable-video-x11 --disable-video-wayland --disable-video-rpi --disable-rpath --disable-esd --disable-oss --disable-sndio --disable-pulseaudio --disable-nas --enable-video-kmsdrm --enable-arm-neon
+make -j4
+sudo make install
+```
 
-###Clone git to raspberry pi's home directory:
-`wget https://github.com/Ketturi/PiLiveMarquee/archive/main.tar.gz`
-`tar -zxf main.tar.gz`
+###### Install LiveMarquee application
+Clone git to raspberry pi's home directory:
+```
+wget https://github.com/Ketturi/PiLiveMarquee/archive/main.tar.gz
+tar -zxf main.tar.gz
+```
 
-###Install python libraries from requirements.txt:
-`cd PiLiveMarquee`
-`sudo pip install -r requrements.txt`
+Install python libraries from requirements.txt:
+```
+cd PiLiveMarquee
+sudo pip install -r requrements.txt
+```
 
-###Create service for launching application:
+Create service for launching application:
 ```
 chmod +x LiveMarquee.py
 
