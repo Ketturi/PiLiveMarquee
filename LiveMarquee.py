@@ -39,9 +39,9 @@ class helpPageResource:
 class romNameResource:
     def on_get(self, req, resp, emulator, romname):
         print(emulator + ":" + romname)
-        if emulator is "":
+        if emulator == "":
             romname= "startimage"
-        if romname is "":
+        if romname == "":
             romname = "default"
 
         result = set_rom_name(emulator, romname)
@@ -66,8 +66,9 @@ if __name__ == '__main__':
     RESOURCES = sdl2.ext.Resources(os.path.join(apppath, "resources"))
 
     sdl2.ext.init()
-
+   
     window = sdl2.ext.Window("Marquee", size=(480, 800), flags=sdl2.SDL_WINDOW_BORDERLESS)
+    sdl2.mouse.SDL_ShowCursor(0)
     window.show()
 
     factory = sdl2.ext.SpriteFactory(sdl2.ext.SOFTWARE)

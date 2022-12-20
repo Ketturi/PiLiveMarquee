@@ -1,0 +1,8 @@
+[Unit]
+Description=Arcade LiveMarquee app
+After=multi-user.target
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/PiLiveMarquee/LiveMarquee.py
+User=pi
+[Install]
+WantedBy=multi-user.target
