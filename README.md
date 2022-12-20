@@ -54,6 +54,7 @@ running the GroovyArcade OS / Attract Mode frontend
 dtoverlay=vc4-fkms-v3d,nocomposite,noaudio
 #dtoverlay=vc4-kms-dsi-7inch
 max_framebuffers=2
+#panel_orientation=left-side-up
 
 # Disable compensation for displays with overscan
 disable_overscan=1
@@ -93,9 +94,12 @@ quiet splash logo.nologo vt.global_cursor_default=0 loglevel=0 fbcon=rotate:3
 ###### Compile SDL2 with KMSDRM support: 
 Currently, libsdl2 from raspbian repository does not support kmsdrm.
 SDL2 has to be compiled, if x11 is not used.
+
 Install needed libraries and build environment:
 ```
-sudo apt install -y build-essential git libasound2-dev libsamplerate0-dev libibus-1.0-dev libdbus-1-dev libudev-dev libgles2-mesa-dev libdrm-dev libgbm-dev
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install -y python3-pip build-essential git libasound2-dev libsamplerate0-dev libibus-1.0-dev libdbus-1-dev libudev-dev libgles2-mesa-dev libdrm-dev libgbm-dev
 ```
 
 Download and compile:
@@ -108,11 +112,17 @@ make -j4
 sudo make install
 ```
 
+Add default user to render group.
+```
+sudo usermod -a -G render pi
+```
+
 ###### Install LiveMarquee application
 Clone git to raspberry pi's home directory:
 ```
 wget https://github.com/Ketturi/PiLiveMarquee/archive/main.tar.gz
 tar -zxf main.tar.gz
+mv PiLiveMarquee-main /PiLiveMarquee
 ```
 
 Install python libraries from requirements.txt:
