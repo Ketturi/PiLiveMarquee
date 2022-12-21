@@ -83,12 +83,13 @@ hdmi_blanking=2
 #dtparam=act_led_activelow=on
 
 gpu_mem=128
+lcd_rotate=3
 ```
 
 Make RPi boot silently and rotate display by adding following
 to the cmdline.txt
 ```
-quiet splash logo.nologo vt.global_cursor_default=0 loglevel=0 fbcon=rotate:3
+quiet splash logo.nologo vt.global_cursor_default=0 loglevel=0 fbcon=rotate:3 video=DSI-1:800x480@60,rotate=270
 ```
 
 ###### Compile SDL2 with KMSDRM support: 

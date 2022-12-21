@@ -13,14 +13,21 @@ import json
 
 def set_rom_name(emulator, romname):
     try:
-        response = RESOURCES.get_path(romname+".png")
-        sprite = factory.from_image(RESOURCES.get_path(romname+".png"))
+        if romname == "default":
+            try:
+                emupath = apppath + "\\resources\\" + emulator + "\\"
+                sprite = factory.from_image(emupath + "default.png")
+            except:
+                sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
+        else:
+            response = RESOURCES.get_path(romname+".png")
+            sprite = factory.from_image(RESOURCES.get_path(romname+".png"))
     except KeyError:
         response = "No such image file found as: " + romname +".png"
         emupath = apppath + "\\resources\\" + emulator + "\\"
         try:
             sprite = factory.from_image(emupath + "default.png")
-        except KeyError:
+        except:
             sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
     spriterenderer.render(sprite)
     window.refresh()
@@ -86,7 +93,7 @@ if __name__ == '__main__':
 
     def http_server():
         print("HTTP server thread started")
-        with make_server('', 80, app) as httpd: 
+        with make_server('', 8080, app) as httpd: 
             #httpd.serve_forever()
             global running
             while running:
