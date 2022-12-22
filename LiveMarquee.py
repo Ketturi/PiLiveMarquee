@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 import time
 from threading import Thread, current_thread
 
@@ -11,21 +12,28 @@ from wsgiref.simple_server import make_server
 import falcon
 import json
 
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
+
 def set_rom_name(emulator, romname):
+    response = ""
     try:
         if romname == "default":
             try:
                 sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
+                response = falcon.HTTP_OK
             except:
                 sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
+                response = falcon.HTTP_NOT_FOUND
         else:
-            response = RESOURCES.get_path(romname+".png")
             sprite = factory.from_image(RESOURCES.get_path(romname+".png"))
+            response = falcon.HTTP_OK
     except KeyError:
-        response = "No such image file found as: " + romname +".png"
+        logging.debug("No such image file found as: " + romname +".png")
         try:
+            response = falcon.HTTP_NO_CONTENT
             sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
         except:
+            response = falcon.HTTP_NOT_FOUND
             sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
     spriterenderer.render(sprite)
     #window.refresh()
@@ -43,16 +51,17 @@ class helpPageResource:
 
 class romNameResource:
     def on_get(self, req, resp, emulator, romname):
-        print(emulator + ":" + romname)
+        logging.debug(emulator + ":" + romname)
         if emulator == "":
             romname= "startimage"
+            emulator == "UI"
         if romname == "":
             romname = "default"
 
         result = set_rom_name(emulator, romname)
-        print(result)
-        resp.text = result
-        resp.status = falcon.HTTP_200
+        logging.debug(result)
+        #resp.text = result
+        resp.status = result
     
 class quitResource:
     def on_get(self, req, resp):
@@ -82,7 +91,7 @@ if __name__ == '__main__':
     spriterenderer = factory.create_sprite_render_system(window)
     spriterenderer.render(sprite)
     window.refresh()
-    print("SDL2 started")
+    logging.debug("SDL2 started")
 
     app = falcon.App()
     app.add_route('/', helpPageResource())
@@ -91,20 +100,20 @@ if __name__ == '__main__':
     app.add_route('/reload', reloadResource())
 
     def http_server():
-        print("HTTP server thread started")
+        logging.debug("HTTP server thread started")
         with make_server('', 8080, app) as httpd: 
             #httpd.serve_forever()
             global running
             while running:
                 httpd.handle_request()
-            print("HTTP server stopped")
+            logging.debug("HTTP server stopped")
             httpd.shutdown()
             httpd.socket.close() 
 
     thread = Thread(target=http_server, name="http_server")
     thread.daemon = True
     thread.start()
-    print("HTTP server started") 
+    logging.debug("HTTP server started") 
     
     running = True
     while running:
@@ -115,6 +124,6 @@ if __name__ == '__main__':
                 break
         window.refresh()
         time.sleep(0.01)
-    print("bye!")
+    logging.debug("bye!")
     sdl2.ext.quit()
     sys.exit()
