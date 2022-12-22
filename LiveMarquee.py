@@ -15,8 +15,7 @@ def set_rom_name(emulator, romname):
     try:
         if romname == "default":
             try:
-                emupath = apppath + "\\resources\\" + emulator + "\\"
-                sprite = factory.from_image(emupath + "default.png")
+                sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
             except:
                 sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
         else:
@@ -24,13 +23,12 @@ def set_rom_name(emulator, romname):
             sprite = factory.from_image(RESOURCES.get_path(romname+".png"))
     except KeyError:
         response = "No such image file found as: " + romname +".png"
-        emupath = apppath + "\\resources\\" + emulator + "\\"
         try:
-            sprite = factory.from_image(emupath + "default.png")
+            sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
         except:
             sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
     spriterenderer.render(sprite)
-    window.refresh()
+    #window.refresh()
     return response
 
 class helpPageResource:
@@ -74,7 +72,7 @@ if __name__ == '__main__':
 
     sdl2.ext.init()
    
-    window = sdl2.ext.Window("Marquee", size=(480, 800), flags=sdl2.SDL_WINDOW_BORDERLESS)
+    window = sdl2.ext.Window("Marquee", size=(800, 480), flags=sdl2.SDL_WINDOW_BORDERLESS)
     sdl2.mouse.SDL_ShowCursor(0)
     window.show()
 
@@ -83,6 +81,7 @@ if __name__ == '__main__':
 
     spriterenderer = factory.create_sprite_render_system(window)
     spriterenderer.render(sprite)
+    window.refresh()
     print("SDL2 started")
 
     app = falcon.App()
@@ -115,7 +114,7 @@ if __name__ == '__main__':
                 running = False
                 break
         window.refresh()
-        time.sleep(0.1)
+        time.sleep(0.01)
     print("bye!")
     sdl2.ext.quit()
     sys.exit()

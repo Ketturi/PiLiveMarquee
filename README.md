@@ -2,6 +2,9 @@
 # PiLiveMarquee
  App for showing arcade art on separate display using RPi and HTTP api
 
+Attract Mode frontend plugin for this app: 
+https://github.com/Ketturi/AttractMode-PiLiveMarquee-Plugin
+
 ## HTTP API
 
 Set image to be shown on the screen:
