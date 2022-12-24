@@ -17,21 +17,13 @@ logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 def set_rom_name(emulator, romname):
     response = ""
     try:
-        if romname == "default":
-            try:
-                sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
-                response = falcon.HTTP_OK
-            except:
-                sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
-                response = falcon.HTTP_NOT_FOUND
-        else:
-            sprite = factory.from_image(RESOURCES.get_path(romname+".png"))
-            response = falcon.HTTP_OK
+        sprite = factory.from_image(emulatos_dict[emulator].get_path(romname+".png"))
+        response = falcon.HTTP_OK
     except KeyError:
         logging.debug("No such image file found as: " + romname +".png")
         try:
             response = falcon.HTTP_NO_CONTENT
-            sprite = factory.from_image(os.path.join(apppath, "resources", emulator, "default.png"))
+            sprite = factory.from_image(os.path.join(resourcespath, emulator, "default.png"))
         except:
             response = falcon.HTTP_NOT_FOUND
             sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
@@ -77,8 +69,10 @@ class reloadResource:
 if __name__ == '__main__':
 # Create a resource container. 
     apppath = os.path.dirname(os.path.abspath(__file__))
-    RESOURCES = sdl2.ext.Resources(os.path.join(apppath, "resources"))
-
+    resourcespath = os.path.join(apppath, "resources")
+    emulatos_dict = {}
+    
+    RESOURCES = sdl2.ext.Resources(resourcespath)
     sdl2.ext.init()
    
     window = sdl2.ext.Window("Marquee", size=(800, 480), flags=sdl2.SDL_WINDOW_BORDERLESS)
@@ -87,11 +81,16 @@ if __name__ == '__main__':
 
     factory = sdl2.ext.SpriteFactory(sdl2.ext.SOFTWARE)
     sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
-
+   
     spriterenderer = factory.create_sprite_render_system(window)
     spriterenderer.render(sprite)
     window.refresh()
     logging.debug("SDL2 started")
+    
+    #Add found subdirectories to list of emulators, and create resource tree with files in directiories
+    for it in os.scandir(resourcespath):
+        if it.is_dir():
+            emulatos_dict[os.path.basename(os.path.normpath(it.path))] = sdl2.ext.Resources(it.path)
 
     app = falcon.App()
     app.add_route('/', helpPageResource())
