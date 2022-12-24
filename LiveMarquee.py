@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
-import os
-import sys
-import logging
-import time
+import os, sys, logging, time
 from threading import Thread, current_thread
 
 import sdl2.ext
@@ -12,19 +9,19 @@ from wsgiref.simple_server import make_server
 import falcon
 import json
 
-logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING) #Change WARNING to DEBUG, if needed
 
 def set_rom_name(emulator, romname):
-    response = ""
+    response = falcon.HTTP_500 #Things are bad, if this is returned for some reason
     try:
         sprite = factory.from_image(emulatos_dict[emulator].get_path(romname+".png"))
         response = falcon.HTTP_OK
-    except KeyError:
+    except KeyError: #Error is expected, not every game will have nice art. Try just showing default image.
         logging.debug("No such image file found as: " + romname +".png")
         try:
             response = falcon.HTTP_NO_CONTENT
             sprite = factory.from_image(os.path.join(resourcespath, emulator, "default.png"))
-        except:
+        except: #Ok, you are missing proper default emulator image
             response = falcon.HTTP_NOT_FOUND
             sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
     spriterenderer.render(sprite)
@@ -32,7 +29,6 @@ def set_rom_name(emulator, romname):
     return response
 
 class helpPageResource:
-    
     def on_get(self, req, resp):
         resp.content_type = falcon.MEDIA_TEXT
         resp.text = ('This is LiveMarquee API. Use GET requests on:\n'+
@@ -44,15 +40,14 @@ class helpPageResource:
 class romNameResource:
     def on_get(self, req, resp, emulator, romname):
         logging.debug(emulator + ":" + romname)
-        if emulator == "":
+        if emulator == "":#Should not be empty, but accidents happen
             romname= "startimage"
-            emulator == "UI"
-        if romname == "":
+            emulator == "AMUI"
+        if romname == "":#Show default image if some reason left empty
             romname = "default"
 
-        result = set_rom_name(emulator, romname)
+        result = set_rom_name(emulator, romname) #This sets the image on screen from parameters
         logging.debug(result)
-        #resp.text = result
         resp.status = result
     
 class quitResource:
@@ -67,18 +62,18 @@ class reloadResource:
         os.execl(sys.executable, sys.executable, *sys.argv)
 
 if __name__ == '__main__':
-# Create a resource container. 
+    # Create a resource container. 
     apppath = os.path.dirname(os.path.abspath(__file__))
     resourcespath = os.path.join(apppath, "resources")
     emulatos_dict = {}
-    
     RESOURCES = sdl2.ext.Resources(resourcespath)
+    #Initialize SDL2 and create window
     sdl2.ext.init()
    
     window = sdl2.ext.Window("Marquee", size=(800, 480), flags=sdl2.SDL_WINDOW_BORDERLESS)
-    sdl2.mouse.SDL_ShowCursor(0)
+    sdl2.mouse.SDL_ShowCursor(0) #Hides the anoying mouse cursor
     window.show()
-
+    #Create sprite engine and populate first image to be shown
     factory = sdl2.ext.SpriteFactory(sdl2.ext.SOFTWARE)
     sprite = factory.from_image(RESOURCES.get_path("startimage.png"))
    
@@ -101,7 +96,7 @@ if __name__ == '__main__':
     def http_server():
         logging.debug("HTTP server thread started")
         with make_server('', 8080, app) as httpd: 
-            #httpd.serve_forever()
+            #Enter into http server loop
             global running
             while running:
                 httpd.handle_request()
@@ -109,12 +104,12 @@ if __name__ == '__main__':
             httpd.shutdown()
             httpd.socket.close() 
 
+    running = True    
     thread = Thread(target=http_server, name="http_server")
     thread.daemon = True
     thread.start()
     logging.debug("HTTP server started") 
     
-    running = True
     while running:
         events = sdl2.ext.get_events()
         for event in events:
@@ -122,7 +117,7 @@ if __name__ == '__main__':
                 running = False
                 break
         window.refresh()
-        time.sleep(0.01)
+        time.sleep(0.01) #Busywaitloop, make sure not to hog all cpu time
     logging.debug("bye!")
     sdl2.ext.quit()
     sys.exit()
