@@ -5,10 +5,6 @@ from threading import Thread, current_thread
 
 import sdl2.ext
 
-from wsgiref.simple_server import make_server
-import falcon
-import json
-
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING) #Change WARNING to DEBUG, if needed
 
 def set_rom_name(emulator, romname):
@@ -39,7 +35,7 @@ class helpPageResource:
 
 class romNameResource:
     def on_get(self, req, resp, emulator, romname):
-        logging.debug(emulator + ":" + romname)
+        logging.debug(" ".join([emulator, ":", romname]))
         if emulator == "":#Should not be empty, but accidents happen
             romname= "startimage"
             emulator == "AMUI"
@@ -49,7 +45,7 @@ class romNameResource:
         result = set_rom_name(emulator, romname) #This sets the image on screen from parameters
         logging.debug(result)
         resp.status = result
-    
+        
 class quitResource:
     def on_get(self, req, resp):
         resp.media = ('Closing server')
@@ -87,9 +83,21 @@ if __name__ == '__main__':
         if it.is_dir():
             emulatos_dict[os.path.basename(os.path.normpath(it.path))] = sdl2.ext.Resources(it.path)
 
+    from wsgiref.simple_server import make_server
+    import falcon, re
+
+    def imageHandler(req, resp, path):
+        global resourcespath
+        path = path.lstrip('/')
+        ext = os.path.splitext(path)[1][1:]
+        image_path = os.path.join(resourcespath, path)
+        resp.content_type = 'image/' + ext
+        resp.stream = open(image_path, 'rb')
+
     app = falcon.App()
     app.add_route('/', helpPageResource())
     app.add_route('/marquee/{emulator}/{romname}', romNameResource())
+    app.add_sink(imageHandler, re.compile(r'/image(?P<path>/.*)'))
     app.add_route('/quit', quitResource())
     app.add_route('/reload', reloadResource())
 
